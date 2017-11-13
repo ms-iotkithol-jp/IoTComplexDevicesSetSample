@@ -1,0 +1,14 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "myEventHubMessage",
+      "direction": "in",
+      "path": "lightning",
+      "connection": "<<event_hub_connection_string for lightning>>",
+      "consumerGroup": "tofunction",
+      "cardinality": "many"
+    }
+  ],
+  "disabled": false
+}

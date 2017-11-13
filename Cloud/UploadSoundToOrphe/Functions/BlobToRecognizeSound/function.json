@@ -1,0 +1,19 @@
+{
+  "bindings": [
+    {
+      "name": "myBlob",
+      "type": "blobTrigger",
+      "direction": "in",
+      "path": "sounds/{name}",
+      "connection": "egcsesync201758_STORAGE"
+    },
+    {
+      "type": "eventHub",
+      "name": "outputChordMessage",
+      "connection": "<<event_hub_connection_string for sound",
+      "path": "sound",
+      "direction": "out"
+    }
+  ],
+  "disabled": false
+}

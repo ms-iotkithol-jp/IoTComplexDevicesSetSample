@@ -1,0 +1,13 @@
+SELECT s.deviceid as contorollerId,
+ c.[Left] as leftId, c.[Right] as rightId,
+CASE WHEN s.chord LIKE '%m' THEN 2 ELSE 1 END AS lightingpattern
+INTO lightning
+FROM sound s 
+JOIN config c ON s.deviceid = c.Controller
+SELECT s.deviceid as contorollerId,
+ c.[Left] as leftId, c.[Right] as rightId,
+ s.chord as chord,
+ CASE WHEN s.chord LIKE '%m' THEN 2 ELSE 1 END AS lightingpattern
+INTO testout
+FROM sound s 
+JOIN config c ON s.deviceid = c.Controller

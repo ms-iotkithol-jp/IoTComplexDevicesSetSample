@@ -1,0 +1,5 @@
+WITH joined AS (
+SELECT s.IoTHub.ConnectionDeviceId as deviceId, s.gesture as gesture, s.time as time, c.type as shoeType, c.controller as controller
+FROM shoes s TIMESTAMP by time
+JOIN config c ON s.IoTHub.ConnectionDeviceId = c.deviceid)
+SELECT controller, case when shoeType = 'left' THEN 'start' ELSE 'stop' END as status INTO playstatus FROM joined WHERE gesture='kick'

@@ -1,0 +1,14 @@
+{
+  "bindings": [
+    {
+      "type": "eventHubTrigger",
+      "name": "myEventHubMessage",
+      "direction": "in",
+      "path": "playstatus",
+      "connection": "<<eventhub_connection_string for playstatus>>",
+      "consumerGroup": "fa",
+      "cardinality": "many"
+    }
+  ],
+  "disabled": false
+}
