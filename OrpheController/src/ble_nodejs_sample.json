@@ -1,0 +1,120 @@
+{
+    "modules": [{
+            "name": "IoTHub",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "build/modules/iothub/libiothub.so"
+                }
+            },
+            "args": {
+                "IoTHubName": "<<Azure IoT Hub Name>>",
+                "IoTHubSuffix": "<<Azure IoT Hub Suffix>>",
+                "Transport": "amqp",
+                "RetryPolicy": "EXPONENTIAL_BACKOFF_WITH_JITTER"
+            }
+        },
+        {
+            "name": "BLE Printer",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "build/samples/ble_gateway/ble_printer/libble_printer.so"
+                }
+            },
+            "args": null
+        },
+        {
+            "name": "mapping",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "build/modules/identitymap/libidentity_map.so"
+                }
+            },
+            "args": [{
+                "macAddress": "AA:BB:CC:DD:EE:FF",
+                "deviceId": "<<Azure IoT Hub Device ID>>",
+                "deviceKey": "<<Azure IoT Hub Device Key>>"
+            }]
+        },
+        {
+            "name": "BleDevice",
+            "description:": "For TI CC2650 Sensor Tag sample.",
+            "loader": {
+                "name": "outprocess",
+                "entrypoint": {
+                    "activation.type": "launch",
+                    "control.id": "/tmp/proxy_sample.control",
+                    "message.id": "/tmp/proxy_sample.message",
+                    "launch": {
+                        "path": "./proxy_sample_remote",
+                        "args": [
+                            "/tmp/proxy_sample.control"
+                        ]
+                    }
+                }
+            },
+            "args": [{
+                "device_mac_address": "<<AA:BB:CC:DD:EE:FF>>",
+                "instructions": [{
+                        "type": "read_once",
+                        "service_uuid": "180a",
+                        "characteristic_uuid": "2a29"
+                    },
+                    {
+                        "type": "write_at_init",
+                        "service_uuid": "f000aa0004514000b000000000000000",
+                        "characteristic_uuid": "F000AA0204514000B000000000000000",
+                        "data": "AQ=="
+                    },
+                    {
+                        "type": "read_periodic",
+                        "service_uuid": "f000aa0004514000b000000000000000",
+                        "characteristic_uuid": "F000AA0104514000B000000000000000",
+                        "interval_in_ms": 1000
+                    },
+                    {
+                        "type": "write_at_exit",
+                        "service_uuid": "f000aa0004514000b000000000000000",
+                        "characteristic_uuid": "F000AA0204514000B000000000000000",
+                        "data": "AA=="
+                    }
+                ]
+            }]
+        },
+        {
+            "name": "Logger",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "build/modules/logger/liblogger.so"
+                }
+            },
+            "args": {
+                "filename": "<</path/to/log-file.log>>"
+            }
+        }
+    ],
+    "links": [{
+            "source": "*",
+            "sink": "Logger"
+        },
+        {
+            "source": "BleDevice",
+            "sink": "mapping"
+        },
+        {
+            "source": "mapping",
+            "sink": "IoTHub"
+        },
+        {
+            "source": "IoTHub",
+            "sink": "mapping"
+        },
+        {
+            "source": "mapping",
+            "sink": "BleDevice"
+        }
+    ]
+}
