@@ -1,0 +1,102 @@
+{
+    "loaders": [{
+        "type": "node",
+        "name": "node",
+        "configuration": {
+            "binding.path": "../../build/bindings/nodejs/libnodejs_binding.so"
+        }
+    }],
+    "modules": [{
+            "name": "IoTHub",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "../../build/modules/iothub/libiothub.so"
+                }
+            },
+            "args": {
+                "IoTHubName": "<<Azure IoT Hub Name>>",
+                "IoTHubSuffix": "<<Azure IoT Hub Suffix>>",
+                "Transport": "amqp",
+                "RetryPolicy": "EXPONENTIAL_BACKOFF_WITH_JITTER"
+            }
+        },
+        {
+            "name": "mapping",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "../../build/modules/identitymap/libidentity_map.so"
+                }
+            },
+            "args": [{
+                "macAddress": "<<Left Shoe - AA:BB:CC:DD:EE:FF>>",
+                "deviceId": "leftshoe",
+                "deviceKey": "<<Azure IoT Hub Device Key for Left Shoe>>"
+            }, {
+                "macAddress": "<<Right Shoe - AA:BB:CC:DD:EE:FF>>",
+                "deviceId": "rightshoe",
+                "deviceKey": "<<Azure IoT Hub Device Key for Right Shoe>>"
+            }]
+        },
+        {
+            "name": "BleDevice",
+            "loader": {
+                "name": "node",
+                "entrypoint": {
+                    "main.path": "ble_nodejs/ble-nodejs-ip.js"
+                }
+            },
+            "args": [{
+                    "device_mac_address": "<<Left Shoe - AA:BB:CC:DD:EE:FF>>",
+                    "instructions": [{
+                        "type": "start_notify",
+                        "service_uuid": "<<orphe service uuid>>",
+                        "characteristic_uuid": "<<orphe characteristic uuid>>"
+                    }]
+                },
+                {
+                    "device_mac_address": "<<Right Shoe - AA:BB:CC:DD:EE:FF>>",
+                    "instructions": [{
+                        "type": "start_notify",
+                        "service_uuid": "<<orphe service uuid>>",
+                        "characteristic_uuid": "<<orphe characteristic uuid>>"
+                    }]
+                }
+            ]
+        },
+        {
+            "name": "Logger",
+            "loader": {
+                "name": "native",
+                "entrypoint": {
+                    "module.path": "../../build/modules/logger/liblogger.so"
+                }
+            },
+            "args": {
+                "filename": "<</path/to/log-file.log>>"
+            }
+        }
+    ],
+    "links": [{
+            "source": "*",
+            "sink": "Logger"
+        },
+        {
+            "source": "BleDevice",
+            "sink": "mapping"
+        },
+        {
+            "source": "mapping",
+            "sink": "IoTHub"
+        },
+        {
+            "source": "IoTHub",
+            "sink": "mapping"
+        },
+        {
+            "source": "mapping",
+            "sink": "BleDevice"
+        }
+    ]
+}
